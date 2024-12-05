@@ -1,46 +1,21 @@
-name: CI/CD Pipeline for Fisio App
+name: CI/CD Pipeline
 
 on:
-  # Ejecutar cuando haya cambios en la rama 'main'
   push:
-    branches:
-      - main
-  pull_request:
     branches:
       - main
 
 jobs:
-  # Este trabajo se ejecutará en un contenedor Ubuntu
   build:
     runs-on: ubuntu-latest
-
     steps:
-    # Paso 1: Verificar el código
     - name: Checkout code
       uses: actions/checkout@v2
-
-    # Paso 2: Configurar Docker
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
-
-    # Paso 3: Construir la imagen de Docker
-    - name: Build Docker image
-      run: |
-        docker-compose -f backend/docker-compose.yml build
-
-    # Paso 4: Levantar los contenedores de Docker
-    - name: Run Docker containers
-      run: |
-        docker-compose -f backend/docker-compose.yml up -d
-
-    # Paso 5: Realizar pruebas (si tienes pruebas automatizadas, las ejecutarías aquí)
-    - name: Run tests (Optional)
-      run: |
-        # Aquí se pueden ejecutar los tests si los tienes configurados
-        # php -f tests/test_script.php
-        echo "No tests defined yet."
-
-    # Paso 6: Detener los contenedores
-    - name: Stop Docker containers
-      run: |
-        docker-compose -f backend/docker-compose.yml down
+      uses: docker/setup-buildx-action@v1
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        push: false
+        tags: user/fisioterapia-app:latest
